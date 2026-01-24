@@ -1,0 +1,4 @@
+@EndUserText.label: 'Product Service Definition'
+define service ZSKENNE_PRODUCT {
+  expose ZC_PRODUCT as product;
+}

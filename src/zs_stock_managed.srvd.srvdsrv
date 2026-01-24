@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Stock Managed'
+define service ZS_STOCK_MANAGED {
+  expose ZC_STOCK_MANAGED as stock;
+}

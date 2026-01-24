@@ -1,0 +1,31 @@
+managed implementation in class zbp_i_sku unique;
+strict ( 2 );
+
+define behavior for ZI_SKU //alias <alias_name>
+persistent table ztsku
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  association _Product;
+
+  validation checkProduct on save
+  {
+    field ProductId;
+  }
+
+  mapping for ztsku{
+
+    SkuId = sku_id;
+    ProductId = product_id;
+    Color = color;
+    IsLock = is_lock;
+    Packaging = packaging;
+
+  }
+
+
+}

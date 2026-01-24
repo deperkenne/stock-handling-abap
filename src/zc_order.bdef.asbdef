@@ -1,0 +1,28 @@
+projection;
+strict ( 2 );
+use draft;
+// containt association, BO action ,CRUD
+define behavior for ZC_ORDER //alias <alias_name>
+use etag
+{
+  use create;
+  use update;
+  use delete;
+  use action Edit;
+  use action Discard;
+  use action Resume;
+  use action Activate;
+  use action Prepare;
+  use association _Items { create; with draft; }
+  use  action delete_all_orders;
+}
+
+
+define behavior for ZC_LINE_ITEM //alias <alias_name>
+{
+use update;
+use delete;
+
+use association _Order {with draft;}
+use  action delete_item_orders;
+}

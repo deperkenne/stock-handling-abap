@@ -1,0 +1,9 @@
+@EndUserText.label: 'customer service'
+define service ZSD_CUSTOMER_RAP {
+  expose ZC_CUSTOMER_RAP  as Customers;
+  expose ZC_PRODUCT       as Products;
+  expose ZC_SKU           as Skus;
+  expose ZC_STOCK_MANAGED as Stock;
+  expose ZC_ORDER         as Orders;
+  expose ZC_LINE_ITEM     as LineItems;
+}

@@ -1,0 +1,4 @@
+@EndUserText.label: 'Service Sku'
+define service ZS_SKU {
+  expose ZC_SKU as sku;
+}

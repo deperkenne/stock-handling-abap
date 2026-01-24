@@ -1,0 +1,44 @@
+
+managed implementation in class zbp_i_stock_managed unique;
+strict ( 2 );
+
+define behavior for ZI_STOCK_MANAGED //alias <alias_name>
+persistent table ztstock
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+
+    validation checkProduct on save
+  {
+    field ProductId;
+  }
+
+    validation checkSku on save
+  {
+    field SkuId;
+  }
+
+  determination setCreatedAt on save { create;}
+  determination setChanged  on modify {field  Quantity; }
+
+  association _Product;
+  association _Sku;
+
+  mapping for ztstock{
+    StockId = stock_id;
+    ProductId = product_id;
+    SkuId = sku_id;
+    ProductName = product_name;
+    UnitPrice = unit_price;
+    Currency  = currency;
+    Quantity = quantity;
+    QUantityReserved = quantity_reserved;
+    AvailableQuantity =  available_quantity;
+    CreatedAt  = created_at;
+    ChangedAt  = changed_at;
+  }
+}

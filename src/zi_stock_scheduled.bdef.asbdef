@@ -1,0 +1,41 @@
+managed implementation in class zbp_i_stock_scheduled unique;
+strict ( 2 );
+
+define behavior for ZI_STOCK_SCHEDULED //alias <alias_name>
+persistent table ztstock_schedule
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+  field ( readonly ,numbering : managed) ScheduledId;
+
+   validation checkProduct on save
+  {
+    field ProductId;
+  }
+
+    validation checkStock on save
+  {
+    field StockId;
+  }
+
+  association _Product;
+  association _Stock;
+
+  mapping for ztstock_schedule{
+    ScheduledId = scheduled_id;
+    ItemUuid    = item_uuid;
+    ProductId = product_id;
+    StockId = stock_id;
+    Type = type;
+    Quantity = quantity;
+    UnitPrice = unit_price;
+    Currency = currency;
+    CreatedAt = created_at;
+
+  }
+
+}

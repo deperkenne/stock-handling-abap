@@ -1,0 +1,4 @@
+@EndUserText.label: 'Order Service'
+define service ZS_ORDER_S {
+  expose ZC_ORDER;
+}

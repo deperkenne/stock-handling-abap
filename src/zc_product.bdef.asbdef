@@ -1,0 +1,8 @@
+projection;
+strict ( 2 );
+
+define behavior for ZC_PRODUCT //alias <alias_name>
+{
+  use create;
+  use update;
+}

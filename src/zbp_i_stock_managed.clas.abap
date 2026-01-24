@@ -1,0 +1,5 @@
+CLASS zbp_i_stock_managed DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF zi_stock_managed.
+ENDCLASS.
+
+CLASS zbp_i_stock_managed IMPLEMENTATION.
+ENDCLASS.

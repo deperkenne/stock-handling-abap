@@ -1,0 +1,6 @@
+CLASS zbp_kenne_i_product DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF zkenne_i_product.
+ENDCLASS.
+
+CLASS zbp_kenne_i_product IMPLEMENTATION.
+
+ENDCLASS.

@@ -1,0 +1,27 @@
+managed implementation in class zbp_i_order_res unique;
+strict ( 2 );
+
+define behavior for ZI_ORDER_RES //alias <alias_name>
+persistent table zstock_res
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+
+
+  field ( readonly, numbering : managed ) StockResUuid;
+
+
+   mapping for zstock_res
+  {
+    StockResUuid = stock_res_uuid ;
+    OrderUuid = order_uuid;
+    ItemUuid =item_uuid ;
+    ProductId = product_id;
+    REsQuantity = res_quantity;
+    Unit = unit;
+  }
+}

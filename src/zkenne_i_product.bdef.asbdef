@@ -1,0 +1,26 @@
+managed implementation in class zbp_kenne_i_product unique;
+strict ( 2 );
+
+define behavior for ZKENNE_I_PRODUCT //alias <alias_name>
+persistent table ztproduct
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+
+// Mappings insertion des donnees de view a db reel
+  mapping for ztproduct
+  {
+    ProductId = product_id;
+    Productname = productname;
+    Price = price;
+    Currency = currency;
+    Status = status;
+    Stock = stock;
+
+  }
+
+}

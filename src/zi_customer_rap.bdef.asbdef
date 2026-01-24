@@ -1,0 +1,36 @@
+managed implementation in class zbp_i_customer_rap unique;
+strict ( 2 );
+
+define behavior for ZI_CUSTOMER_RAP //alias <alias_name>
+persistent table zrap_customer
+lock master
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+ // field ( readonly ) CustomerId;
+
+ field ( mandatory ) FirstName, LastName, Email;
+
+ // NB ses validations vont s'executer au moment de la CRUD
+ validation validateEmail on save { field Email; }
+ validation validateNames on save { field FirstName, LastName; }
+
+
+
+  // Mappings insertion des donnees de view a db reel
+  mapping for zrap_customer
+  {
+    CustomerId = customer_id;
+    FirstName = first_name;
+    LastName = last_name;
+    Email = email;
+    Country = country;
+    City = city;
+    Street = street;
+    HouseNumber = house_number;
+    PostalCode = postalcode;
+  }
+}

@@ -1,0 +1,7 @@
+CLASS zbp_i_view_product DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF zi_view_product.
+ENDCLASS.
+
+CLASS zbp_i_view_product IMPLEMENTATION.
+
+
+ENDCLASS.

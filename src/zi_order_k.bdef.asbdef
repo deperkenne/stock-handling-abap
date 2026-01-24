@@ -1,0 +1,89 @@
+managed implementation in class zbp_i_order_k unique;
+strict ( 2 );
+with draft;
+
+define behavior for ZI_ORDER_K  //alias <alias_name>
+persistent table ztorder
+draft table ztorder_d
+lock master total etag CreatedAt
+authorization master ( instance )
+//etag master <field_name>
+{
+  create ( authorization : global );
+  update;
+  delete;
+
+
+  validation checkEmptyOrder on save { create; update;}
+
+  draft action Edit;    // 3. Actions standard requises pour le Draft
+  draft action Activate;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare {
+     validation checkEmptyOrder;
+  }
+
+  // Gestion automatique de l'UUID par le framework
+  field ( readonly, numbering : managed ) OrderUuid;
+  // Déclaration de la détermination
+  // NB ses validations vont s'executer au moment de la CRUD
+
+  determination setID on save { create; }
+  determination setStatustoNew on modify { create; }
+  determination updateStock on save { create; }
+
+
+  association _Items { create; with draft;}
+   // Action pour vider les postes (logique à coder dans la classe de base)
+  static action delete_all_orders result [1] $self;
+
+
+
+
+  mapping for ztorder
+  {
+    OrderUuid = order_uuid;
+    OrderId = order_id;
+    CustomerId = customer_id;
+    TotalAmount = total_amount;
+    Currency = currency;
+    CreatedAt = created_at;
+    Status = status;
+  }
+}
+
+
+define behavior for ZILINE_ITEM //alias <alias_name>
+persistent table ztline_item
+draft table ztline_item_d
+lock dependent by _Order
+authorization dependent by _Order
+//etag master <field_name>
+{
+  update;
+  delete;
+  association _Order {with draft;}
+
+  field ( readonly, numbering : managed ) ItemUuid;
+
+  field ( readonly : update ) OrderUuid;
+  determination TotalPrice_1 on modify {field Quantity, Price; create; delete;}
+  determination handleStockChange on modify { create; delete; field Quantity, ProductId; }
+  action  delete_item_orders result [1] $self;  // ← Retourne l'entité modifiée
+
+   mapping for ztline_item
+  {
+    ItemUuid = item_uuid;
+    OrderUuid = order_uuid;
+    ItemId = item_id;
+    OrderId = order_id;
+    ProductId = product_id;
+    ProductName = product_name;
+    Quantity = quantity;
+    Unit = unit;
+    Price = price;
+    Currency = currency;
+    GrossAmount = grossAmount;
+  }
+}
