@@ -68,7 +68,7 @@ authorization dependent by _Order
   field ( readonly, numbering : managed ) ItemUuid;
 
   field ( readonly : update ) OrderUuid;
-  determination TotalPrice_1 on modify {field Quantity, Price; create; delete;}
+  determination TotalPrice_1 on modify { create; }
   determination handleStockChange on modify { create; delete; field Quantity, ProductId; }
   action  delete_item_orders result [1] $self;  // ← Retourne l'entité modifiée
 
