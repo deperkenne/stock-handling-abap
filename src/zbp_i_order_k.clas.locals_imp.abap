@@ -15,33 +15,27 @@ CLASS lhc_ziline_item IMPLEMENTATION.
   METHOD TotalPrice_1.
 
     DATA: lo_item_repo TYPE REF TO  zif_lineitem_repo,
-          lo_items_service TYPE REF TO zif_lineitem_service.
-    DATA: lt_keys       TYPE zif_lineitem_repo=>ti_keys_read,
-          lt_keys_o     TYPE zif_lineitem_repo=>to_keys_read,
-          lt_results    TYPE zif_lineitem_repo=>item_data.
-    DATA items_keys TYPE TABLE FOR READ IMPORT ziline_item.
+          lo_items_service TYPE REF TO zif_lineitem_service,
+          lo_items_calculator TYPE REF TO zif_lineitem_calculator,
+          lo_new_quantity  TYPE REF TO zif_lineitem_new_quantyity,
+          lo_workflow_service TYPE REF TO zif_order_workflow_service.
 
     lo_item_repo  = NEW zcl_lineitem_impl(  ).
-    lo_items_service = NEW zcl_lineitem_service_impl(  ).
+    lo_items_calculator = NEW zcl_lineitem_calculator_impl(  ).
+    lo_new_quantity     = NEW zcl_lineitem_new_quantity_impl( io_lineitem_repo = lo_item_repo ).
+    lo_workflow_service = NEW zcl_order_workflow_sv_impl(
+        io_calculator   = lo_items_calculator
+        io_new_quantity = lo_new_quantity
+        io_repository   = lo_item_repo
+    ).
 
-    " retrieve all keys during execution  request in realtime
+    DATA: lt_keys       TYPE zif_lineitem_repo=>ti_keys_read.
+
     lt_keys = VALUE #( FOR key IN keys ( %tky = key-%tky ) ).
 
-    lo_item_repo->getlineitem(
-          EXPORTING it_keys =  lt_keys
-          IMPORTING et_items = lt_results
-      ).
+    lo_workflow_service->start_process(
+         EXPORTING it_keys =  lt_keys
 
-    " prepare keys
-    lt_keys_o = VALUE #( FOR item_r in lt_results
-                         ( %tky-OrderUuid = item_r-OrderUuid
-                            %is_draft = item_r-%is_draft ) ).
-
-    " make total price calculation
-    lo_items_service->totalprice(
-           EXPORTING
-            it_keys =  lt_keys_o
-            it_items = lt_results
      ).
 
   ENDMETHOD.
