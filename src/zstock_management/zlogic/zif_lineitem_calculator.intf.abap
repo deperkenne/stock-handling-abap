@@ -1,0 +1,11 @@
+INTERFACE zif_lineitem_calculator
+  PUBLIC .
+
+  METHODS calculate_gross_amounts
+    IMPORTING
+      it_items TYPE zif_lineitem_repo=>item_data
+    EXPORTING
+      et_update TYPE zif_lineitem_repo=>t_u_items
+      et_delete TYPE zif_lineitem_repo=>t_d_items.
+
+ENDINTERFACE.
