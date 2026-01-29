@@ -13,17 +13,38 @@ ENDCLASS.
 
 
 CLASS zcl_lineitem_impl IMPLEMENTATION.
+  METHOD zif_lineitem_repo~getrealtimelineitem.
+     READ ENTITIES OF zi_order_k IN LOCAL MODE
+          ENTITY ziline_item
+          ALL FIELDS WITH CORRESPONDING #( it_keys )
+          RESULT DATA(lt_items)
+          FAILED DATA(ls_failed)
+          REPORTED DATA(ls_reported).
+     et_items    = lt_items.
+     et_failed   = ls_failed.
+     et_reported = ls_reported.
+  ENDMETHOD.
 
   METHOD zif_lineitem_repo~getlineitem.
+     DATA  lt_keys_to_read TYPE TABLE FOR READ IMPORT ziline_item.
+
+     lt_keys_to_read = VALUE #( FOR wa IN it_update_table (
+        %is_draft = wa-%is_draft
+        ItemUuid  = wa-ItemUuid
+      ) ).
+
      READ ENTITIES OF zi_order_k IN LOCAL MODE
-      ENTITY ziline_item
-      ALL FIELDS WITH CORRESPONDING #( it_keys )
-      RESULT DATA(lt_items).
-      et_items = CORRESPONDING #( lt_items ).
+          ENTITY ziline_item
+            FROM lt_keys_to_read
+          RESULT DATA(lt_items)
+          FAILED DATA(ls_failed)
+          REPORTED DATA(ls_reported).
+     et_items    = lt_items.
+     et_failed   = ls_failed.
+     et_reported = ls_reported.
   ENDMETHOD.
 
   METHOD zif_lineitem_repo~update.
-
      MODIFY ENTITIES OF zi_order_k IN LOCAL MODE
             ENTITY ziline_item
                UPDATE FIELDS ( Quantity )
@@ -31,42 +52,27 @@ CLASS zcl_lineitem_impl IMPLEMENTATION.
             FAILED DATA(ls_failed)
             REPORTED DATA(ls_reported)
             MAPPED DATA(ls_mapped).
+  ENDMETHOD.
 
+   METHOD zif_lineitem_repo~update_grossamount.
+     MODIFY ENTITIES OF zi_order_k IN LOCAL MODE
+            ENTITY ziline_item
+               UPDATE FIELDS ( grossamount )
+                WITH it_update_table
+            FAILED DATA(ls_failed)
+            REPORTED DATA(ls_reported)
+            MAPPED DATA(ls_mapped).
   ENDMETHOD.
 
   METHOD zif_lineitem_repo~delete.
-
-    DATA: lt_keys_for_read TYPE TABLE FOR READ IMPORT ziline_item.
-    DATA: lt_items_to_delete TYPE TABLE FOR DELETE ziline_item.
-
-    " Puis remplissez-la avec une boucle classique
-    LOOP AT it_delete_item INTO DATA(ls_item).
-      APPEND VALUE #(
-        %is_draft = ls_item-%is_draft
-        ItemUuid  = ls_item-ItemUuid
-      ) TO lt_keys_for_read.
-    ENDLOOP.
-
-    " Ensuite utilisez cette table
-    READ ENTITIES OF zi_order_k IN LOCAL MODE
-      ENTITY ziline_item
-        FROM lt_keys_for_read
-      RESULT DATA(lt_existing_items).
-
-      if sy-subrc = 0.
-         APPEND ls_item TO lt_items_to_delete.
-      ENDIF.
-
      MODIFY ENTITIES OF zi_order_k IN LOCAL MODE
           ENTITY ziline_item
-            DELETE FROM lt_items_to_delete
+            DELETE FROM it_delete_item
           FAILED   DATA(ls_failed_del)
           REPORTED DATA(ls_reported_del)
           MAPPED   DATA(ls_mapped_del).
-
-          et_failed = ls_failed_del.
-          et_reported = ls_reported_del.
-
+    et_failed   = ls_failed_del.
+    et_reported = ls_reported_del.
   ENDMETHOD.
 
   METHOD zif_lineitem_repo~get_order_lineItem.
@@ -78,5 +84,4 @@ CLASS zcl_lineitem_impl IMPLEMENTATION.
         REPORTED DATA(ls_r_items).
         et_items = CORRESPONDING #( lt_all_item ).
    ENDMETHOD.
-
 ENDCLASS.

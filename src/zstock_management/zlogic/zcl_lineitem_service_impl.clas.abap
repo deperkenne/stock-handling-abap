@@ -23,12 +23,13 @@ ENDCLASS.
 CLASS zcl_lineitem_service_impl IMPLEMENTATION.
 
   METHOD zif_lineitem_service~totalprice.
-
+      " stark kupplung depending on concrete class
       order_service = NEW zcl_order_service_impl(  ).
 
       DATA lt_to_update TYPE TABLE FOR UPDATE ziline_item.
       DATA lt_keys_to_read TYPE TABLE FOR READ  IMPORT ziline_item.
 
+      " call internal updateQuantity method dependency 1
       zif_lineitem_service~updateQuantity(
 
           EXPORTING
@@ -39,7 +40,7 @@ CLASS zcl_lineitem_service_impl IMPLEMENTATION.
 
       ).
 
-    " we make a mmaping from table to update to table to read reason is we need to read data not update or delete
+    " mapping from table lt_to_update to table  lt_keys_to_read reason is we need to read data not update or delete
     lt_keys_to_read = VALUE #( FOR wa IN lt_to_update (
         %is_draft = wa-%is_draft
         ItemUuid  = wa-ItemUuid
@@ -61,6 +62,7 @@ CLASS zcl_lineitem_service_impl IMPLEMENTATION.
       REPORTED DATA(ls_reported)
       FAILED DATA(ls_failed).
 
+      " call method "order total amount" from order_service class dependency 2
       IF ls_failed IS INITIAL.
 
         order_service->ordertotalamount(
