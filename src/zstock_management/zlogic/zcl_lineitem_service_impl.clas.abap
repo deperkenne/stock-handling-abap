@@ -9,7 +9,7 @@ CLASS zcl_lineitem_service_impl DEFINITION
   PRIVATE SECTION.
    " Dependencies injection
    DATA: i_line_item TYPE REF TO zif_lineitem_repo,
-         order_service TYPE REF TO zif_order_service.
+         order_service TYPE REF TO zif_order_calculator.
 
    DATA lt_items_to_update TYPE TABLE FOR UPDATE ziline_item.
    DATA lt_items_to_delete TYPE TABLE FOR DELETE ziline_item.
@@ -24,7 +24,7 @@ CLASS zcl_lineitem_service_impl IMPLEMENTATION.
 
   METHOD zif_lineitem_service~totalprice.
       " stark kupplung depending on concrete class
-      order_service = NEW zcl_order_service_impl(  ).
+      order_service = NEW zcl_order_calculator_impl(  ).
 
       DATA lt_to_update TYPE TABLE FOR UPDATE ziline_item.
       DATA lt_keys_to_read TYPE TABLE FOR READ  IMPORT ziline_item.

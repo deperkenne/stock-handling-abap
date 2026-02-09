@@ -22,6 +22,13 @@ define  view entity ZILINE_ITEM as select from ztline_item
     currency as Currency,
     @Semantics.amount.currencyCode: 'Currency'
     grossamount as GrossAmount,
+    created_at as CreatedAt,
+    @Semantics.systemDateTime.createdAt: true
+    created_at_new as CreatedAtNew,
+    @Semantics.systemDateTime.localInstanceLastChangedAt: true
+    local_last_changed_at as LocalLastChangedAt,
+    @Semantics.systemDateTime.lastChangedAt: true
+    last_changed_at as LastChangedAt,
     _Order,
     _Product
     

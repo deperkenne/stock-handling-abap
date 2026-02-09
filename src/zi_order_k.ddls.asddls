@@ -14,8 +14,13 @@ define root view entity ZI_ORDER_K as select from ztorder
     total_amount as TotalAmount,
     currency as Currency,
     created_at as CreatedAt,
+    @Semantics.systemDateTime.createdAt: true
+    created_at_new as CreatedAtNew,
+    @Semantics.systemDateTime.localInstanceLastChangedAt: true
+    local_last_changed_at as LocalLastChangedAt,
+    @Semantics.systemDateTime.lastChangedAt: true
+    last_changed_at as LastChangedAt,
     status as Status,
     _Items,
-    _Customer
-    
+    _Customer  
 }

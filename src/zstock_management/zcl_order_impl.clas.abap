@@ -31,7 +31,7 @@ CLASS zcl_order_impl IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD zif_order_repo~updateorder.
+  METHOD zif_order_repo~update.
 
      MODIFY ENTITIES OF zi_order_k IN LOCAL MODE
           ENTITY zi_order_k

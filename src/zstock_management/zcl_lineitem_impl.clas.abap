@@ -10,8 +10,6 @@ CLASS zcl_lineitem_impl DEFINITION
 
 ENDCLASS.
 
-
-
 CLASS zcl_lineitem_impl IMPLEMENTATION.
   METHOD zif_lineitem_repo~getrealtimelineitem.
      READ ENTITIES OF zi_order_k IN LOCAL MODE
@@ -27,7 +25,7 @@ CLASS zcl_lineitem_impl IMPLEMENTATION.
 
   METHOD zif_lineitem_repo~getlineitem.
      DATA  lt_keys_to_read TYPE TABLE FOR READ IMPORT ziline_item.
-
+     " mapping updated table to read table
      lt_keys_to_read = VALUE #( FOR wa IN it_update_table (
         %is_draft = wa-%is_draft
         ItemUuid  = wa-ItemUuid
@@ -54,7 +52,25 @@ CLASS zcl_lineitem_impl IMPLEMENTATION.
             MAPPED DATA(ls_mapped).
   ENDMETHOD.
 
-   METHOD zif_lineitem_repo~update_grossamount.
+  METHOD zif_lineitem_repo~updateCreatedAt.
+      DATA update_date_with_keys TYPE TABLE FOR UPDATE ziline_item.
+      LOOP AT it_keys INTO DATA(keys).
+          APPEND VALUE #(
+             %tky = keys-%tky
+             CreatedAt = utclong_current( )
+           ) TO update_date_with_keys .
+
+      ENDLOOP.
+       " update createdAt for a new items
+      MODIFY ENTITIES OF zi_order_k IN LOCAL MODE
+        ENTITY ziline_item
+          UPDATE FIELDS ( CreatedAt )
+          WITH update_date_with_keys.
+
+  ENDMETHOD.
+
+
+  METHOD zif_lineitem_repo~update_grossamount.
      MODIFY ENTITIES OF zi_order_k IN LOCAL MODE
             ENTITY ziline_item
                UPDATE FIELDS ( grossamount )
@@ -76,12 +92,19 @@ CLASS zcl_lineitem_impl IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_lineitem_repo~get_order_lineItem.
+
+     DATA lt_keys_read   TYPE TABLE FOR READ IMPORT zi_order_k.
+
+     "fill lt_keys_read
+     lt_keys_read = VALUE #( FOR it IN it_items
+                       ( %is_draft = it-%is_draft
+                         OrderUuid  = it-OrderUuid ) ).
      READ ENTITIES OF zi_order_k IN LOCAL MODE
         ENTITY zi_order_k BY \_Items
-            FIELDS ( ProductId Quantity ) WITH CORRESPONDING #( it_keys )
+            ALL FIELDS  WITH CORRESPONDING #( lt_keys_read )
         RESULT DATA(lt_all_item)
         FAILED DATA(ls_f_items)
         REPORTED DATA(ls_r_items).
-        et_items = CORRESPONDING #( lt_all_item ).
+        et_items = CORRESPONDING #( lt_all_item ). " see this again for performence
    ENDMETHOD.
 ENDCLASS.

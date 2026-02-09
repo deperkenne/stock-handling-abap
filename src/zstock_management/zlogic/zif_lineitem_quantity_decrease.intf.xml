@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>ZIF_ORDER_SERVICE</CLSNAME>
+    <CLSNAME>ZIF_LINEITEM_QUANTITY_DECREASE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Order Service interface</DESCRIPT>
+    <DESCRIPT>Decrease Qty service</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>

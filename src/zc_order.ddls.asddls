@@ -15,6 +15,10 @@ define root view entity ZC_ORDER
     @Semantics.amount.currencyCode: 'Currency'
     TotalAmount,
     Currency,
+    CreatedAt,
+    CreatedAtNew,
+    LocalLastChangedAt,
+    LastChangedAt,
     Status,
     _Items : redirected to composition child ZC_LINE_ITEM
     

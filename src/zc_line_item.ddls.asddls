@@ -18,7 +18,16 @@ define  view entity ZC_LINE_ITEM
     Currency,
     @Semantics.amount.currencyCode: 'Currency'
     GrossAmount,
+    CreatedAt,
+    CreatedAtNew,
+    LocalLastChangedAt,
+    LastChangedAt,
+    @ObjectModel.virtualElementCalculatedBy: 'ABAP:ZCL_CALC_TOTAL_QTY'
+    @Semantics.quantity.unitOfMeasure : 'Unit' 
+    virtual TotalProductQty : abap.quan(13,3),    
+    @ObjectModel.virtualElementCalculatedBy: 'ABAP:ZCL_CALC_TOTAL_QTY'
+    @Semantics.amount.currencyCode  : 'Currency' 
+    virtual TotalAmount :  abap.curr(15,2),
     /* Associations */
-    _Order : redirected to parent ZC_ORDER
-   
+    _Order : redirected to parent ZC_ORDER  
 }

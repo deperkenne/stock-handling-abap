@@ -5,37 +5,33 @@ with draft;
 define behavior for ZI_ORDER_K  //alias <alias_name>
 persistent table ztorder
 draft table ztorder_d
-lock master total etag CreatedAt
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
 authorization master ( instance )
-//etag master <field_name>
 {
-  create ( authorization : global );
-  update;
+  create ( authorization : global, precheck );
+  update ( precheck );
   delete;
-
+  association _Items { create; with draft;}
 
   validation checkEmptyOrder on save { create; update;}
 
   draft action Edit;    // 3. Actions standard requises pour le Draft
-  draft action Activate;
+  draft action Activate optimized;
   draft action Discard;
   draft action Resume;
   draft determine action Prepare {
      validation checkEmptyOrder;
   }
 
-  // Gestion automatique de l'UUID par le framework
+
   field ( readonly, numbering : managed ) OrderUuid;
-  // Déclaration de la détermination
-  // NB ses validations vont s'executer au moment de la CRUD
 
   determination setID on save { create; }
   determination setStatustoNew on modify { create; }
   determination updateStock on save { create; }
 
 
-  association _Items { create; with draft;}
-   // Action pour vider les postes (logique à coder dans la classe de base)
   static action delete_all_orders result [1] $self;
 
 
@@ -49,6 +45,8 @@ authorization master ( instance )
     TotalAmount = total_amount;
     Currency = currency;
     CreatedAt = created_at;
+    LocalLastChangedAt = local_last_changed_at;
+    LastChangedAt      = last_changed_at;
     Status = status;
   }
 }
@@ -59,18 +57,18 @@ persistent table ztline_item
 draft table ztline_item_d
 lock dependent by _Order
 authorization dependent by _Order
-//etag master <field_name>
+etag master LocalLastChangedAt
 {
   update;
   delete;
   association _Order {with draft;}
 
   field ( readonly, numbering : managed ) ItemUuid;
+  field ( readonly ) CreatedAt;
 
   field ( readonly : update ) OrderUuid;
-  determination TotalPrice_1 on modify { create; }
-  determination handleStockChange on modify { create; delete; field Quantity, ProductId; }
-  action  delete_item_orders result [1] $self;  // ← Retourne l'entité modifiée
+  determination TotalPrice_1 on modify { create; field Quantity, Price;  }
+  action  delete_item_orders result [1] $self;  // ← Return modified entity (externe action)
 
    mapping for ztline_item
   {
@@ -85,5 +83,8 @@ authorization dependent by _Order
     Price = price;
     Currency = currency;
     GrossAmount = grossAmount;
+    CreatedAt = created_at;
+    LocalLastChangedAt = local_last_changed_at;
+    LastChangedAt      = last_changed_at;
   }
 }

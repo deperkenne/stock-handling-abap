@@ -25,41 +25,41 @@ CLASS zcl_lineitem_new_quantity_impl IMPLEMENTATION.
   METHOD zif_lineitem_new_quantyity~calculator_new_quantity.
 
       DATA: lt_items_to_update TYPE TABLE FOR UPDATE ziline_item,
-            lt_items_to_delete TYPE TABLE FOR DELETE ziline_item,
-            lt_keys_read   TYPE TABLE FOR READ IMPORT zi_order_k.
+            lt_items_to_delete TYPE TABLE FOR DELETE ziline_item.
+
       DATA  lt_result     TYPE zif_lineitem_repo=>item_data.
       DATA: lt_failed TYPE RESPONSE FOR FAILED zi_order_k,
             lt_reported TYPE  RESPONSE FOR REPORTED zi_order_k.
 
-      "fill lt_keys_read
-      lt_keys_read = VALUE #( FOR it IN it_items
-                       ( %is_draft = it-%is_draft
-                         OrderUuid  = it-OrderUuid ) ).
       " call get_oder_item to return the specific line item with this orderuuid
       lineitem->get_order_lineitem(
-             EXPORTING  it_keys  = lt_keys_read
+             EXPORTING  it_items  = it_items
              IMPORTING et_items  = lt_result
       ).
 
-      LOOP AT it_items INTO DATA(items).
-          DATA(lt_existing_only) = lt_result.
-          DELETE lt_existing_only WHERE %tky = items-%tky.
-          " fs_existing_item represent a specific line in lt_all_item he contain all existing  info (%tky,Quantity,price...)
-          READ TABLE lt_existing_only
-            ASSIGNING FIELD-SYMBOL(<fs_existing_item>) " using Assigning, we point directly to the table line
-            WITH KEY ProductId = items-ProductId.
+      SORT lt_result BY ProductId ASCENDING CreatedAt ASCENDING.
 
-          IF sy-subrc = 0.
-            APPEND VALUE #(
-              %tky = items-%tky
-             ) TO lt_items_to_delete.
+      LOOP AT it_items INTO DATA(ls_new_item).
+          READ TABLE lt_result ASSIGNING FIELD-SYMBOL(<fs_old_item>)
+          WITH KEY ProductId = ls_new_item-ProductId.
 
-            APPEND VALUE #(
-                  %tky     = <fs_existing_item>-%tky
-                  Quantity = <fs_existing_item>-Quantity + items-Quantity
-                  %control = VALUE #( Quantity = if_abap_behv=>mk-on )
-                ) TO lt_items_to_update.
+        " Si trouvé ET que ce n'est pas la même ligne (UUID différent)
+        IF sy-subrc = 0 AND <fs_old_item>-%tky <> ls_new_item-%tky.
+
+               APPEND VALUE #( %tky = ls_new_item-%tky ) TO lt_items_to_delete.
+
+               <fs_old_item>-Quantity += ls_new_item-Quantity.
+
+                APPEND VALUE #(
+                      %tky     =  <fs_old_item>-%tky
+                      Quantity =  <fs_old_item>-Quantity
+                      %control = VALUE #( Quantity = if_abap_behv=>mk-on )
+                    ) TO lt_items_to_update.
           ENDIF.
+
+
+
+
       ENDLOOP.
       et_update = lt_items_to_update.
       et_delete = lt_items_to_delete.

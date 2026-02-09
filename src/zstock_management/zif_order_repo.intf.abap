@@ -19,7 +19,7 @@
      IMPORTING order_id TYPE order_data
      EXPORTING order TYPE order_data.
 
-  METHODS updateOrder
+  METHODS update
      CHANGING it_order TYPE t_order_to_update.
 
 ENDINTERFACE.
